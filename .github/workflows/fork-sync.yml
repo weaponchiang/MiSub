@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: write
-  workflows: write
 
 jobs:
   sync_with_upstream:
@@ -19,7 +18,7 @@ jobs:
       - name: Checkout target repo
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.SYNC_TOKEN }}
           fetch-depth: 0
           ref: main
 
@@ -41,6 +40,8 @@ jobs:
 
           git fetch --prune upstream
           git fetch --prune origin
+          # 将 origin 的推送凭证切换为 SYNC_TOKEN
+          git remote set-url origin https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/${{ github.repository }}.git
 
       - name: Merge from upstream and resolve conflicts (prefer upstream)
         id: merge_attempt
